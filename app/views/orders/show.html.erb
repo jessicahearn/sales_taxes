@@ -1,0 +1,14 @@
+<h1>Order #<%= @order.identifier %></h1>
+<div>This page displays item prices with tax, and a summary of total tax and total cost with tax for the order.</div>
+<div class="card">
+	<% @order.products.each do |product| %>
+		<div><%= product.name %>: <%= humanized_money_with_symbol(product.price_with_tax) %></div>
+	<% end %>
+	<div class="card-footer">
+		<div>Sales Taxes: <%= humanized_money_with_symbol(@order.total_tax) %></div>
+		<div>Total: <%= humanized_money_with_symbol(@order.total_cost_with_tax) %></div>
+	</div>
+</div>
+<div class="btn">
+	<%= link_to "Orders Index", orders_path %>
+</div>

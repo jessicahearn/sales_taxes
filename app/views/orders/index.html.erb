@@ -1,0 +1,14 @@
+<h1>Orders</h1>
+<div>Here is a list of Orders in progress. Product prices are listed without tax.</div>
+
+<% @orders.each do |order| %>
+	<div class="card">
+		<h2>Order #<%= order.identifier %></h2>
+		<% order.products.each do |product| %>
+			<div><%= product.name %>: <%= humanized_money_with_symbol(product.base_price) %></div>
+		<% end %>
+		<div class="btn">
+			<%= link_to "Show Receipt For Order ##{order.identifier}", order_path(order) %>
+		</div>
+	</div>
+<% end %>
