@@ -3,9 +3,12 @@ class Product < ApplicationRecord
   has_many :orders_products
   has_many :orders, through: :orders_products
 
-  delegate :sales_tax_exempt, to: :tax_category
-
   monetize :base_price_cents
+
+  def sales_tax_exempt
+    return false unless tax_category.present?
+    tax_category.sales_tax_exempt
+  end
 
   def price_with_tax
     Money.new(TaxCalculatorService.price_with_tax(self))
