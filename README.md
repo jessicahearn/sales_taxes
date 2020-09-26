@@ -16,6 +16,8 @@ You must have postgres installed to run this project. Once that's done, run the 
 
 The site can be viewed at `localhost:3000`
 
+You can run the test suite with `bundle exec rspec`, and then view a test coverage report at `coverage/index.html`
+
 ## Notes
 
 My approach here is to centralize the tax calculations in one location (TaxCalculatorService) so that any future changes to tax rates can be made painlessly, without a lot of refactoring elsewhere. The methods of the TaxCalculatorService all expect either a single product or an array of products as arguments, which means that the TaxCalculatorService is currently aware of the available methods on the product model. If, at some point in the future, the TaxCalculatorService needed to be further generalized to deal with other less predictable types of objects (e.g. variants of products, or products with different pricing models like subscription services), it would not be difficult to convert it to accept raw values instead -- but for the present circumstances this approach is the most straightforward option.
