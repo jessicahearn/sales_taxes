@@ -31,70 +31,167 @@ RSpec.describe TaxCalculatorService do
 
   subject { TaxCalculatorService }
 
-  # All other methods in this service are used in the process of testing these four methods, and
-  # these methods can directly test all of the key information displayed on user-facing pages.
-  # Note that this service handles all amounts in cents, so all numbers being tested here are integers.
-
-  describe '.price_with_tax' do
-    # Products for Order 1
-    # Only one product in this order is subject to sales tax, and none are imported.
-    it 'should return base price with no tax for order 1 product 1' do
-      expect(subject.price_with_tax(order_1.products.first)).to eq(1249)
-    end
-    it 'should return base price + sales tax for order 1 product 2' do
-      expect(subject.price_with_tax(order_1.products.second)).to eq(1649)
-    end
-    it 'should return base price for order 1 product 3' do
-      expect(subject.price_with_tax(order_1.products.third)).to eq(85)
+  context 'when given a single product' do
+    it 'calculates the import tax' do
+      should respond_to(:import_tax)
     end
 
-    # Products for Order 2
-    # Both products in this order are imported, and one is subject to sales tax.
-    it 'should return base price + import tax for order 2 product 1' do
-      expect(subject.price_with_tax(order_2.products.first)).to eq(1050)
-    end
-    it 'should return base price + sales tax + import tax for order 2 product 2' do
-      expect(subject.price_with_tax(order_2.products.second)).to eq(5465)
+    it 'calculates the sales tax' do
+      should respond_to(:sales_tax)
     end
 
-    # Products for Order 3
-    # This order includes one product each for each possible scenario:
-    # - Sales Tax + Import Tax
-    # - Sales Tax Only
-    # - No Tax
-    # - Import Tax Only
-    it 'should return base price + sales tax + import tax for order 3 product 1' do
-      expect(subject.price_with_tax(order_3.products.first)).to eq(3219)
+    it 'calculates the combined tax' do
+      should respond_to(:combined_tax)
     end
-    it 'should return base price + sales tax for order 3 product 2' do
-      expect(subject.price_with_tax(order_3.products.second)).to eq(2089)
-    end
-    it 'should return base price for order 3 product 3' do
-      expect(subject.price_with_tax(order_3.products.third)).to eq(975)
-    end
-    it 'should return base price + import tax for order 3 product 4' do
-      expect(subject.price_with_tax(order_3.products.fourth)).to eq(1185)
+
+    it 'calculates the price with tax' do
+      should respond_to(:price_with_tax)
     end
   end
 
-  describe '.total_cost_base' do
-    # This method returns the sum of all product prices in a given order, excluding tax
-    it { expect(subject.total_cost_base(order_1.products)).to eq(2833) }
-    it { expect(subject.total_cost_base(order_2.products)).to eq(5750) }
-    it { expect(subject.total_cost_base(order_3.products)).to eq(6798) }
+  context 'when given an array of products' do
+    it 'calculates the total base cost' do
+      should respond_to(:total_cost_base)
+    end
+
+    it 'calculates the total tax' do
+      should respond_to(:total_tax)
+    end
+
+    it 'calculates the total cost with tax' do
+      should respond_to(:total_cost_with_tax)
+    end
   end
 
-  describe '.total_tax' do
-    # This method returns the sum of all taxes for products in a given order
-    it { expect(subject.total_tax(order_1.products)).to eq(150) }
-    it { expect(subject.total_tax(order_2.products)).to eq(765) }
-    it { expect(subject.total_tax(order_3.products)).to eq(670) }
+  context 'Test Order 1' do
+    context 'Product 1' do
+      describe '.price_with_tax' do
+        it 'returns 1249 cents (base price + 0 tax)' do
+          expect(subject.price_with_tax(order_1.products.first)).to eq(1249)
+        end
+      end
+    end
+
+    context 'Product 2' do
+      describe '.price_with_tax' do
+        it 'returns 1649 cents (base price + sales tax)' do
+          expect(subject.price_with_tax(order_1.products.second)).to eq(1649)
+        end
+      end
+    end
+
+    context 'Product 3' do
+      describe '.price_with_tax' do
+        it 'returns 85 cents (base price + 0 tax)' do
+          expect(subject.price_with_tax(order_1.products.third)).to eq(85)
+        end
+      end
+    end
+
+    describe '.total_cost_base' do
+      it 'returns 2833 cents (sum of base prices)' do
+        expect(subject.total_cost_base(order_1.products)).to eq(2833)
+      end
+    end
+
+    describe '.total_tax' do
+      it 'returns 150 cents (sum of all taxes)' do
+        expect(subject.total_tax(order_1.products)).to eq(150)
+      end
+    end
+
+    describe '.total_cost_with_tax' do
+      it 'returns 2983 cents (total cost base + total tax)' do
+        expect(subject.total_cost_with_tax(order_1.products)).to eq(2983)
+      end
+    end
   end
 
-  describe '.total_cost_with_tax' do
-    # This method returns the sum of all product prices in a given order, including tax
-    it { expect(subject.total_cost_with_tax(order_1.products)).to eq(2983) }
-    it { expect(subject.total_cost_with_tax(order_2.products)).to eq(6515) }
-    it { expect(subject.total_cost_with_tax(order_3.products)).to eq(7468) }
+  context 'Test Order 2' do
+    context 'Product 1' do
+      describe '.price_with_tax' do
+        it 'returns 1050 cents (base price + import tax)' do
+          expect(subject.price_with_tax(order_2.products.first)).to eq(1050)
+        end
+      end
+    end
+
+    context 'Product 2' do
+      describe '.price_with_tax' do
+        it 'returns 5465 cents (base price + sales tax + import tax)' do
+          expect(subject.price_with_tax(order_2.products.second)).to eq(5465)
+        end
+      end
+    end
+
+    describe '.total_cost_base' do
+      it 'returns 5750 cents (sum of base prices)' do
+        expect(subject.total_cost_base(order_2.products)).to eq(5750)
+      end
+    end
+
+    describe '.total_tax' do
+      it 'returns 765 cents (sum of all taxes)' do
+        expect(subject.total_tax(order_2.products)).to eq(765)
+      end
+    end
+
+    describe '.total_cost_with_tax' do
+      it 'returns 6515 cents (total_cost_base + total_tax)' do
+        expect(subject.total_cost_with_tax(order_2.products)).to eq(6515)
+      end
+    end
+  end
+
+  context 'Test Order 3' do
+    context 'Product 1' do
+      describe '.price_with_tax' do
+        it 'returns 3219 cents (base price + sales tax + import tax)' do
+          expect(subject.price_with_tax(order_3.products.first)).to eq(3219)
+        end
+      end
+    end
+
+    context 'Product 2' do
+      describe '.price_with_tax' do
+        it 'returns 2089 cents (base price + sales tax)' do
+          expect(subject.price_with_tax(order_3.products.second)).to eq(2089)
+        end
+      end
+    end
+
+    context 'Product 3' do
+      describe '.price_with_tax' do
+        it 'returns 975 cents (base price + 0 tax)' do
+          expect(subject.price_with_tax(order_3.products.third)).to eq(975)
+        end
+      end
+    end
+
+    context 'Product 4' do
+      describe '.price_with_tax' do
+        it 'returns 1185 cents (base price + import tax)' do
+          expect(subject.price_with_tax(order_3.products.fourth)).to eq(1185)
+        end
+      end
+    end
+
+    describe '.total_cost_base' do
+      it 'returns 6798 cents (sum of base prices)' do
+        expect(subject.total_cost_base(order_3.products)).to eq(6798)
+      end
+    end
+
+    describe '.total_tax' do
+      it 'returns 670 cents (sum of all taxes)' do
+        expect(subject.total_tax(order_3.products)).to eq(670)
+      end
+    end
+
+    describe '.total_cost_with_tax' do
+      it 'returns 7468 cents (total_cost_base + total_tax)' do
+        expect(subject.total_cost_with_tax(order_3.products)).to eq(7468)
+      end
+    end
   end
 end

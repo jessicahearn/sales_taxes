@@ -10,6 +10,10 @@ class Product < ApplicationRecord
     tax_category.sales_tax_exempt
   end
 
+  def sales_tax_exempt?
+    sales_tax_exempt
+  end
+
   def price_with_tax
     Money.new(TaxCalculatorService.price_with_tax(self))
   end
